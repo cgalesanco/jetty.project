@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.Resource;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
@@ -43,7 +44,8 @@ public class WarPluginInfo
     private List<String> _dependentMavenWarIncludes;
     private List<String> _dependentMavenWarExcludes;
     private List<OverlayConfig> _overlayConfigs;
-    
+    private Resource[] _webResources;
+
     
     
     /**
@@ -199,5 +201,9 @@ public class WarPluginInfo
         if (node == null)
             return "";
         return node.toString();
+    }
+
+    public Resource[] getWarWebResources() {
+        return _webResources;
     }
 }
