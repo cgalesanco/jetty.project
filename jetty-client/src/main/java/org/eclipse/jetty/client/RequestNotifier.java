@@ -1,6 +1,6 @@
 //
 //  ========================================================================
-//  Copyright (c) 1995-2013 Mort Bay Consulting Pty. Ltd.
+//  Copyright (c) 1995-2014 Mort Bay Consulting Pty. Ltd.
 //  ------------------------------------------------------------------------
 //  All rights reserved. This program and the accompanying materials
 //  are made available under the terms of the Eclipse Public License v1.0
@@ -165,6 +165,8 @@ public class RequestNotifier
     {
         // Slice the buffer to avoid that listeners peek into data they should not look at.
         content = content.slice();
+        if (!content.hasRemaining())
+            return;
         // Optimized to avoid allocations of iterator instances.
         List<Request.RequestListener> requestListeners = request.getRequestListeners(null);
         for (int i = 0; i < requestListeners.size(); ++i)

@@ -1,6 +1,6 @@
 //
 //  ========================================================================
-//  Copyright (c) 1995-2013 Mort Bay Consulting Pty. Ltd.
+//  Copyright (c) 1995-2014 Mort Bay Consulting Pty. Ltd.
 //  ------------------------------------------------------------------------
 //  All rights reserved. This program and the accompanying materials
 //  are made available under the terms of the Eclipse Public License v1.0
@@ -28,6 +28,7 @@ import org.eclipse.jetty.io.MappedByteBufferPool;
 import org.eclipse.jetty.util.BufferUtil;
 import org.eclipse.jetty.websocket.api.WebSocketPolicy;
 import org.eclipse.jetty.websocket.common.frames.TextFrame;
+import org.eclipse.jetty.websocket.common.test.IncomingFramesCapture;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -69,17 +70,16 @@ public class GeneratorParserRoundtripTest
         capture.assertNoErrors();
         capture.assertHasFrame(OpCode.TEXT,1);
 
-        TextFrame txt = (TextFrame)capture.getFrames().get(0);
+        TextFrame txt = (TextFrame)capture.getFrames().poll();
         Assert.assertThat("Text parsed",txt.getPayloadAsUTF8(),is(message));
     }
 
     @Test
     public void testParserAndGeneratorMasked() throws Exception
     {
-        WebSocketPolicy policy = WebSocketPolicy.newClientPolicy();
         ByteBufferPool bufferPool = new MappedByteBufferPool();
-        Generator gen = new Generator(policy,bufferPool);
-        Parser parser = new Parser(policy,bufferPool);
+        Generator gen = new Generator(WebSocketPolicy.newClientPolicy(),bufferPool);
+        Parser parser = new Parser(WebSocketPolicy.newServerPolicy(),bufferPool);
         IncomingFramesCapture capture = new IncomingFramesCapture();
         parser.setIncomingFramesHandler(capture);
 
@@ -116,7 +116,7 @@ public class GeneratorParserRoundtripTest
         capture.assertNoErrors();
         capture.assertHasFrame(OpCode.TEXT,1);
 
-        TextFrame txt = (TextFrame)capture.getFrames().get(0);
+        TextFrame txt = (TextFrame)capture.getFrames().poll();
         Assert.assertTrue("Text.isMasked",txt.isMasked());
         Assert.assertThat("Text parsed",txt.getPayloadAsUTF8(),is(message));
     }

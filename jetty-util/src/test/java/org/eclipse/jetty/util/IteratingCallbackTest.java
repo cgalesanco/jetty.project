@@ -1,6 +1,6 @@
 //
 //  ========================================================================
-//  Copyright (c) 1995-2013 Mort Bay Consulting Pty. Ltd.
+//  Copyright (c) 1995-2014 Mort Bay Consulting Pty. Ltd.
 //  ------------------------------------------------------------------------
 //  All rights reserved. This program and the accompanying materials
 //  are made available under the terms of the Eclipse Public License v1.0
@@ -54,15 +54,15 @@ public class IteratingCallbackTest
             int i=10;
             
             @Override
-            protected State process() throws Exception
+            protected Action process() throws Exception
             {
                 processed++;
                 if (i-->1)      
                 {
                     succeeded(); // fake a completed IO operation
-                    return State.SCHEDULED;
+                    return Action.SCHEDULED;
                 }
-                return State.SUCCEEDED;
+                return Action.SUCCEEDED;
             }
         };
         
@@ -81,15 +81,15 @@ public class IteratingCallbackTest
             int i=4;
             
             @Override
-            protected State process() throws Exception
+            protected Action process() throws Exception
             {
                 processed++;
                 if (i-->1)      
                 {
                     scheduler.schedule(successTask,50,TimeUnit.MILLISECONDS);
-                    return State.SCHEDULED;
+                    return Action.SCHEDULED;
                 }
-                return State.SUCCEEDED;
+                return Action.SUCCEEDED;
             }
         };
         
@@ -108,15 +108,15 @@ public class IteratingCallbackTest
             int i=4;
             
             @Override
-            protected State process() throws Exception
+            protected Action process() throws Exception
             {
                 processed++;
                 if (i-->1)      
                 {
                     scheduler.schedule(successTask,50,TimeUnit.MILLISECONDS);
-                    return State.SCHEDULED;
+                    return Action.SCHEDULED;
                 }
-                return State.SUCCEEDED;
+                return Action.SUCCEEDED;
             }
         };
         
@@ -145,7 +145,7 @@ public class IteratingCallbackTest
             int i=10;
             
             @Override
-            protected State process() throws Exception
+            protected Action process() throws Exception
             {
                 processed++;
                 if (i-->1)      
@@ -154,9 +154,9 @@ public class IteratingCallbackTest
                         succeeded(); // fake a completed IO operation
                     else
                         failed(new Exception("testing"));
-                    return State.SCHEDULED;
+                    return Action.SCHEDULED;
                 }
-                return State.SUCCEEDED;
+                return Action.SUCCEEDED;
             }
         };
         
@@ -173,15 +173,15 @@ public class IteratingCallbackTest
             int i=4;
             
             @Override
-            protected State process() throws Exception
+            protected Action process() throws Exception
             {
                 processed++;
                 if (i-->1)      
                 {
                     scheduler.schedule(i>2?successTask:failTask,50,TimeUnit.MILLISECONDS);
-                    return State.SCHEDULED;
+                    return Action.SCHEDULED;
                 }
-                return State.SUCCEEDED;
+                return Action.SUCCEEDED;
             }
         };
         
@@ -202,7 +202,7 @@ public class IteratingCallbackTest
             int i=5;
             
             @Override
-            protected State process()
+            protected Action process()
             {
                 processed++;
                 
@@ -210,11 +210,11 @@ public class IteratingCallbackTest
                 {
                     case 5:
                         succeeded();
-                        return State.SCHEDULED;
+                        return Action.SCHEDULED;
                         
                     case 4:
                         scheduler.schedule(successTask,5,TimeUnit.MILLISECONDS);
-                        return State.SCHEDULED;
+                        return Action.SCHEDULED;
                         
                     case 3:
                         scheduler.schedule(new Runnable()
@@ -225,18 +225,18 @@ public class IteratingCallbackTest
                                 idle.countDown();
                             }
                         },5,TimeUnit.MILLISECONDS);
-                        return State.IDLE;
+                        return Action.IDLE;
 
                     case 2:
                         succeeded();
-                        return State.SCHEDULED;
+                        return Action.SCHEDULED;
                         
                     case 1:
                         scheduler.schedule(successTask,5,TimeUnit.MILLISECONDS);
-                        return State.SCHEDULED;
+                        return Action.SCHEDULED;
                         
                     case 0:
-                        return State.SUCCEEDED;
+                        return Action.SUCCEEDED;
                         
                     default: 
                         throw new IllegalStateException();

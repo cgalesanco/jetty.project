@@ -1,6 +1,6 @@
 //
 //  ========================================================================
-//  Copyright (c) 1995-2013 Mort Bay Consulting Pty. Ltd.
+//  Copyright (c) 1995-2014 Mort Bay Consulting Pty. Ltd.
 //  ------------------------------------------------------------------------
 //  All rights reserved. This program and the accompanying materials
 //  are made available under the terms of the Eclipse Public License v1.0
@@ -64,9 +64,9 @@ public class WebSocketExtensionFactory extends ExtensionFactory
             if (ext instanceof AbstractExtension)
             {
                 AbstractExtension aext = (AbstractExtension)ext;
-                aext.setConfig(config);
                 aext.setPolicy(policy);
                 aext.setBufferPool(bufferPool);
+                aext.setConfig(config);
             }
             return ext;
         }

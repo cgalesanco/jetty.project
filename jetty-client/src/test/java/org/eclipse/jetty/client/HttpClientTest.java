@@ -1,6 +1,6 @@
 //
 //  ========================================================================
-//  Copyright (c) 1995-2013 Mort Bay Consulting Pty. Ltd.
+//  Copyright (c) 1995-2014 Mort Bay Consulting Pty. Ltd.
 //  ------------------------------------------------------------------------
 //  All rights reserved. This program and the accompanying materials
 //  are made available under the terms of the Eclipse Public License v1.0
@@ -1050,5 +1050,27 @@ public class HttpClientTest extends AbstractHttpClientServerTest
         Assert.assertEquals(1, complete.get());
         Assert.assertArrayEquals(content, listener.getContent());
         Assert.assertArrayEquals(content, response.getContent());
+    }
+
+    @Test
+    public void testCustomHostHeader() throws Exception
+    {
+        final String host = "localhost";
+        start(new AbstractHandler()
+        {
+            @Override
+            public void handle(String target, org.eclipse.jetty.server.Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException
+            {
+                baseRequest.setHandled(true);
+                Assert.assertEquals(host, request.getServerName());
+            }
+        });
+
+        ContentResponse response = client.newRequest("http://127.0.0.1:" + connector.getLocalPort() + "/path")
+                .scheme(scheme)
+                .header(HttpHeader.HOST, host)
+                .send();
+
+        Assert.assertEquals(200, response.getStatus());
     }
 }

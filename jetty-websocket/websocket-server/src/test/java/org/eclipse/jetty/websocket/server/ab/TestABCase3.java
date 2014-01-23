@@ -1,6 +1,6 @@
 //
 //  ========================================================================
-//  Copyright (c) 1995-2013 Mort Bay Consulting Pty. Ltd.
+//  Copyright (c) 1995-2014 Mort Bay Consulting Pty. Ltd.
 //  ------------------------------------------------------------------------
 //  All rights reserved. This program and the accompanying materials
 //  are made available under the terms of the Eclipse Public License v1.0
@@ -23,12 +23,15 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.jetty.toolchain.test.AdvancedRunner;
+import org.eclipse.jetty.util.log.StacklessLogging;
 import org.eclipse.jetty.websocket.api.StatusCode;
 import org.eclipse.jetty.websocket.common.CloseInfo;
+import org.eclipse.jetty.websocket.common.Parser;
 import org.eclipse.jetty.websocket.common.WebSocketFrame;
 import org.eclipse.jetty.websocket.common.frames.BinaryFrame;
 import org.eclipse.jetty.websocket.common.frames.PingFrame;
 import org.eclipse.jetty.websocket.common.frames.TextFrame;
+import org.eclipse.jetty.websocket.common.test.Fuzzer;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -49,7 +52,7 @@ public class TestABCase3 extends AbstractABCase
         WebSocketFrame expect = new CloseInfo(StatusCode.PROTOCOL).asFrame();
 
         Fuzzer fuzzer = new Fuzzer(this);
-        try
+        try(StacklessLogging logging = new StacklessLogging(Parser.class))
         {
             fuzzer.connect();
             fuzzer.setSendMode(Fuzzer.SendMode.BULK);
@@ -78,7 +81,7 @@ public class TestABCase3 extends AbstractABCase
         expect.add(new CloseInfo(StatusCode.PROTOCOL).asFrame());
 
         Fuzzer fuzzer = new Fuzzer(this);
-        try
+        try(StacklessLogging logging = new StacklessLogging(Parser.class))
         {
             fuzzer.connect();
             fuzzer.setSendMode(Fuzzer.SendMode.BULK);
@@ -107,7 +110,7 @@ public class TestABCase3 extends AbstractABCase
         expect.add(new CloseInfo(StatusCode.PROTOCOL).asFrame());
 
         Fuzzer fuzzer = new Fuzzer(this);
-        try
+        try(StacklessLogging logging = new StacklessLogging(Parser.class))
         {
             fuzzer.connect();
             fuzzer.setSendMode(Fuzzer.SendMode.PER_FRAME);
@@ -136,7 +139,7 @@ public class TestABCase3 extends AbstractABCase
         expect.add(new CloseInfo(StatusCode.PROTOCOL).asFrame());
 
         Fuzzer fuzzer = new Fuzzer(this);
-        try
+        try(StacklessLogging logging = new StacklessLogging(Parser.class))
         {
             fuzzer.connect();
             fuzzer.setSendMode(Fuzzer.SendMode.SLOW);
@@ -166,7 +169,7 @@ public class TestABCase3 extends AbstractABCase
         expect.add(new CloseInfo(StatusCode.PROTOCOL).asFrame());
 
         Fuzzer fuzzer = new Fuzzer(this);
-        try
+        try(StacklessLogging logging = new StacklessLogging(Parser.class))
         {
             fuzzer.connect();
             fuzzer.setSendMode(Fuzzer.SendMode.BULK);
@@ -195,7 +198,7 @@ public class TestABCase3 extends AbstractABCase
         expect.add(new CloseInfo(StatusCode.PROTOCOL).asFrame());
 
         Fuzzer fuzzer = new Fuzzer(this);
-        try
+        try(StacklessLogging logging = new StacklessLogging(Parser.class))
         {
             fuzzer.connect();
             fuzzer.setSendMode(Fuzzer.SendMode.BULK);
@@ -228,7 +231,7 @@ public class TestABCase3 extends AbstractABCase
         expect.add(new CloseInfo(StatusCode.PROTOCOL).asFrame());
 
         Fuzzer fuzzer = new Fuzzer(this);
-        try
+        try(StacklessLogging logging = new StacklessLogging(Parser.class))
         {
             fuzzer.connect();
             fuzzer.setSendMode(Fuzzer.SendMode.BULK);

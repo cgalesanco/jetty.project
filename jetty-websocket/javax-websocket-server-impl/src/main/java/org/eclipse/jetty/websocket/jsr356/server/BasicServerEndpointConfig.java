@@ -1,6 +1,6 @@
 //
 //  ========================================================================
-//  Copyright (c) 1995-2013 Mort Bay Consulting Pty. Ltd.
+//  Copyright (c) 1995-2014 Mort Bay Consulting Pty. Ltd.
 //  ------------------------------------------------------------------------
 //  All rights reserved. This program and the accompanying materials
 //  are made available under the terms of the Eclipse Public License v1.0
@@ -34,7 +34,7 @@ public class BasicServerEndpointConfig implements ServerEndpointConfig
     private final List<Class<? extends Encoder>> encoders;
     private final List<Extension> extensions;
     private final List<String> subprotocols;
-    private final Configurator configurator;
+    private final ServerEndpointConfig.Configurator configurator;
     private final Class<?> endpointClass;
     private final String path;
     private Map<String, Object> userProperties;
@@ -115,7 +115,7 @@ public class BasicServerEndpointConfig implements ServerEndpointConfig
     }
 
     @Override
-    public Configurator getConfigurator()
+    public ServerEndpointConfig.Configurator getConfigurator()
     {
         return configurator;
     }

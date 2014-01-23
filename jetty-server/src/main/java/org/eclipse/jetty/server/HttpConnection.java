@@ -1,6 +1,6 @@
 //
 //  ========================================================================
-//  Copyright (c) 1995-2013 Mort Bay Consulting Pty. Ltd.
+//  Copyright (c) 1995-2014 Mort Bay Consulting Pty. Ltd.
 //  ------------------------------------------------------------------------
 //  All rights reserved. This program and the accompanying materials
 //  are made available under the terms of the Eclipse Public License v1.0
@@ -19,7 +19,6 @@
 package org.eclipse.jetty.server;
 
 import java.nio.ByteBuffer;
-import java.nio.channels.ByteChannel;
 import java.util.concurrent.RejectedExecutionException;
 
 import org.eclipse.jetty.http.HttpGenerator;
@@ -38,7 +37,6 @@ import org.eclipse.jetty.io.EofException;
 import org.eclipse.jetty.util.BufferUtil;
 import org.eclipse.jetty.util.Callback;
 import org.eclipse.jetty.util.IteratingCallback;
-import org.eclipse.jetty.util.IteratingNestedCallback;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
 
@@ -212,8 +210,7 @@ public class HttpConnection extends AbstractConnection implements Runnable, Http
                     else
                     {
                         // Get a buffer
-                        if (_requestBuffer == null)
-                            _requestBuffer = _bufferPool.acquire(getInputBufferSize(), REQUEST_BUFFER_DIRECT);
+                        _requestBuffer = getRequestBuffer();
 
                         // fill
                         filled = getEndPoint().fill(_requestBuffer);
@@ -234,7 +231,11 @@ public class HttpConnection extends AbstractConnection implements Runnable, Http
                     // if the request suspends, the request/response will be incomplete so the outer loop will exit.
                     suspended = !_channel.handle();
                 }
-                
+                else
+                {
+                    // We parsed what we could, recycle the request buffer
+                    releaseRequestBuffer();
+                }
             }
         }
         catch (EofException e)
@@ -489,7 +490,7 @@ public class HttpConnection extends AbstractConnection implements Runnable, Http
         }
 
         @Override
-        public State process() throws Exception
+        public Action process() throws Exception
         {
             ByteBuffer chunk = _chunk;
             while (true)
@@ -509,6 +510,8 @@ public class HttpConnection extends AbstractConnection implements Runnable, Http
                     case NEED_HEADER:
                     {
                         // Look for optimisation to avoid allocating a _header buffer
+                        /*
+                         Cannot use this optimisation unless we work out how not to overwrite data in user passed arrays.
                         if (_lastContent && _content!=null && !_content.isReadOnly() && _content.hasArray() && BufferUtil.space(_content)>_config.getResponseHeaderSize() )
                         {
                             // use spare space in content buffer for header buffer
@@ -522,7 +525,9 @@ public class HttpConnection extends AbstractConnection implements Runnable, Http
                             _content.limit(l);
                         }
                         else
+                        */
                             _header = _bufferPool.acquire(_config.getResponseHeaderSize(), HEADER_BUFFER_DIRECT);
+                            
                         continue;
                     }
                     case NEED_CHUNK:
@@ -565,7 +570,7 @@ public class HttpConnection extends AbstractConnection implements Runnable, Http
                         }
                         else
                             continue;
-                        return State.SCHEDULED;
+                        return Action.SCHEDULED;
                     }
                     case SHUTDOWN_OUT:
                     {
@@ -580,7 +585,7 @@ public class HttpConnection extends AbstractConnection implements Runnable, Http
                             if (!_lastContent || _content==null || !_content.hasArray() || !_header.hasArray() ||  _content.array()!=_header.array())
                                 _bufferPool.release(_header);
                         }
-                        return State.SUCCEEDED;
+                        return Action.SUCCEEDED;
                     }
                     case CONTINUE:
                     {
@@ -637,7 +642,7 @@ public class HttpConnection extends AbstractConnection implements Runnable, Http
         }
 
         @Override
-        public State process() throws Exception
+        public Action process() throws Exception
         {
             ByteBuffer chunk = _chunk;
             while (true)
@@ -682,7 +687,7 @@ public class HttpConnection extends AbstractConnection implements Runnable, Http
                         }
                         else
                             continue;
-                        return State.SCHEDULED;
+                        return Action.SCHEDULED;
                     }
                     case SHUTDOWN_OUT:
                     {
@@ -691,7 +696,7 @@ public class HttpConnection extends AbstractConnection implements Runnable, Http
                     }
                     case DONE:
                     {
-                        return State.SUCCEEDED;
+                        return Action.SUCCEEDED;
                     }
                     case CONTINUE:
                     {
@@ -715,14 +720,22 @@ public class HttpConnection extends AbstractConnection implements Runnable, Http
         public void failed(final Throwable x)
         {
             super.failed(x);
-            getExecutor().execute(new Runnable()
+            try
             {
-                @Override
-                public void run()
+                getExecutor().execute(new Runnable()
                 {
-                    _callback.failed(x);
-                }
-            });
+                    @Override
+                    public void run()
+                    {
+                        _callback.failed(x);
+                    }
+                });
+            }
+            catch (RejectedExecutionException e)
+            {
+                LOG.debug(e);
+                _callback.failed(x);
+            }
         }
     }
 

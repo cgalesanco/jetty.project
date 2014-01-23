@@ -1,6 +1,6 @@
 //
 //  ========================================================================
-//  Copyright (c) 1995-2013 Mort Bay Consulting Pty. Ltd.
+//  Copyright (c) 1995-2014 Mort Bay Consulting Pty. Ltd.
 //  ------------------------------------------------------------------------
 //  All rights reserved. This program and the accompanying materials
 //  are made available under the terms of the Eclipse Public License v1.0
@@ -26,10 +26,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.eclipse.jetty.io.AbstractConnection;
 import org.eclipse.jetty.io.EndPoint;
 import org.eclipse.jetty.util.ArrayQueue;
-import org.eclipse.jetty.util.Callback;
 import org.eclipse.jetty.util.IteratingCallback;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
@@ -54,8 +52,9 @@ public class FrameFlusher
     private final Generator generator;
 
     private final Object lock = new Object();
+    
     /** Backlog of frames */
-    private final ArrayQueue<FrameEntry> queue = new ArrayQueue<>(lock);
+    private final ArrayQueue<FrameEntry> queue = new ArrayQueue<>(16,16,lock);
     
     private final FlusherCB flusherCB = new FlusherCB();
     
@@ -219,7 +218,7 @@ public class FrameFlusher
         }
 
         @Override
-        protected State process() throws Exception
+        protected Action process() throws Exception
         {
             synchronized (lock)
             {
@@ -243,11 +242,11 @@ public class FrameFlusher
             }
             
             if (buffers.size()==0)
-                return State.IDLE;
+                return Action.IDLE;
 
             endpoint.write(this,buffers.toArray(new ByteBuffer[buffers.size()]));
             buffers.clear();
-            return State.SCHEDULED;
+            return Action.SCHEDULED;
         }
 
         @Override

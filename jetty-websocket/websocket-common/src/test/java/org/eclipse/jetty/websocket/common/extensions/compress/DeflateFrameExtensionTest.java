@@ -1,6 +1,6 @@
 //
 //  ========================================================================
-//  Copyright (c) 1995-2013 Mort Bay Consulting Pty. Ltd.
+//  Copyright (c) 1995-2014 Mort Bay Consulting Pty. Ltd.
 //  ------------------------------------------------------------------------
 //  All rights reserved. This program and the accompanying materials
 //  are made available under the terms of the Eclipse Public License v1.0
@@ -18,9 +18,7 @@
 
 package org.eclipse.jetty.websocket.common.extensions.compress;
 
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -38,26 +36,22 @@ import org.eclipse.jetty.util.TypeUtil;
 import org.eclipse.jetty.websocket.api.WebSocketPolicy;
 import org.eclipse.jetty.websocket.api.extensions.ExtensionConfig;
 import org.eclipse.jetty.websocket.api.extensions.Frame;
-import org.eclipse.jetty.websocket.common.ByteBufferAssert;
 import org.eclipse.jetty.websocket.common.Generator;
-import org.eclipse.jetty.websocket.common.Hex;
-import org.eclipse.jetty.websocket.common.IncomingFramesCapture;
 import org.eclipse.jetty.websocket.common.OpCode;
-import org.eclipse.jetty.websocket.common.OutgoingNetworkBytesCapture;
 import org.eclipse.jetty.websocket.common.Parser;
-import org.eclipse.jetty.websocket.common.UnitParser;
 import org.eclipse.jetty.websocket.common.WebSocketFrame;
+import org.eclipse.jetty.websocket.common.extensions.AbstractExtensionTest;
+import org.eclipse.jetty.websocket.common.extensions.ExtensionTool.Tester;
 import org.eclipse.jetty.websocket.common.frames.TextFrame;
+import org.eclipse.jetty.websocket.common.test.ByteBufferAssert;
+import org.eclipse.jetty.websocket.common.test.IncomingFramesCapture;
+import org.eclipse.jetty.websocket.common.test.OutgoingNetworkBytesCapture;
+import org.eclipse.jetty.websocket.common.test.UnitParser;
 import org.junit.Assert;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestName;
 
-public class DeflateFrameExtensionTest
+public class DeflateFrameExtensionTest extends AbstractExtensionTest
 {
-    @Rule
-    public TestName testname = new TestName();
-
     private void assertIncoming(byte[] raw, String... expectedTextDatas)
     {
         WebSocketPolicy policy = WebSocketPolicy.newClientPolicy();
@@ -85,9 +79,9 @@ public class DeflateFrameExtensionTest
         capture.assertFrameCount(len);
         capture.assertHasFrame(OpCode.TEXT,len);
 
-        for (int i = 0; i < len; i++)
+        int i=0;
+        for (WebSocketFrame actual: capture.getFrames())
         {
-            WebSocketFrame actual = capture.getFrames().get(i);
             String prefix = "Frame[" + i + "]";
             Assert.assertThat(prefix + ".opcode",actual.getOpCode(),is(OpCode.TEXT));
             Assert.assertThat(prefix + ".fin",actual.isFin(),is(true));
@@ -98,6 +92,7 @@ public class DeflateFrameExtensionTest
             ByteBuffer expected = BufferUtil.toBuffer(expectedTextDatas[i],StandardCharsets.UTF_8);
             Assert.assertThat(prefix + ".payloadLength",actual.getPayloadLength(),is(expected.remaining()));
             ByteBufferAssert.assertEquals(prefix + ".payload",expected,actual.getPayload().slice());
+            i++;
         }
     }
 
@@ -129,58 +124,90 @@ public class DeflateFrameExtensionTest
     @Test
     public void testBlockheadClient_HelloThere()
     {
-        // Captured from Blockhead Client - "Hello" then "There" via unit test
-        String hello = "c18700000000f248cdc9c90700";
-        String there = "c187000000000ac9482d4a0500";
-        byte rawbuf[] = Hex.asByteArray(hello + there);
-        assertIncoming(rawbuf,"Hello","There");
+        Tester tester = serverExtensions.newTester("deflate-frame");
+
+        tester.assertNegotiated("deflate-frame");
+
+        tester.parseIncomingHex(// Captured from Blockhead Client - "Hello" then "There" via unit test
+                "c18700000000f248cdc9c90700", // "Hello"
+                "c187000000000ac9482d4a0500" // "There"
+                );
+
+        tester.assertHasFrames("Hello","There");
     }
 
     @Test
     public void testChrome20_Hello()
     {
-        // Captured from Chrome 20.x - "Hello" (sent from browser)
-        byte rawbuf[] = Hex.asByteArray("c187832b5c11716391d84a2c5c");
-        assertIncoming(rawbuf,"Hello");
+        Tester tester = serverExtensions.newTester("deflate-frame");
+
+        tester.assertNegotiated("deflate-frame");
+
+        tester.parseIncomingHex(// Captured from Chrome 20.x - "Hello" (sent from browser)
+                "c187832b5c11716391d84a2c5c" // "Hello"
+                );
+
+        tester.assertHasFrames("Hello");
     }
 
     @Test
     public void testChrome20_HelloThere()
     {
-        // Captured from Chrome 20.x - "Hello" then "There" (sent from browser)
-        String hello = "c1877b1971db8951bc12b21e71";
-        String there = "c18759edc8f4532480d913e8c8";
-        byte rawbuf[] = Hex.asByteArray(hello + there);
-        assertIncoming(rawbuf,"Hello","There");
+        Tester tester = serverExtensions.newTester("deflate-frame");
+
+        tester.assertNegotiated("deflate-frame");
+
+        tester.parseIncomingHex(// Captured from Chrome 20.x - "Hello" then "There" (sent from browser)
+                "c1877b1971db8951bc12b21e71", // "Hello"
+                "c18759edc8f4532480d913e8c8" // There
+                );
+
+        tester.assertHasFrames("Hello","There");
     }
 
     @Test
     public void testChrome20_Info()
     {
-        // Captured from Chrome 20.x - "info:" (sent from browser)
-        byte rawbuf[] = Hex.asByteArray("c187ca4def7f0081a4b47d4fef");
-        assertIncoming(rawbuf,"info:");
+        Tester tester = serverExtensions.newTester("deflate-frame");
+
+        tester.assertNegotiated("deflate-frame");
+
+        tester.parseIncomingHex(// Captured from Chrome 20.x - "info:" (sent from browser)
+                "c187ca4def7f0081a4b47d4fef" // example payload 
+                );
+
+        tester.assertHasFrames("info:");
     }
 
     @Test
     public void testChrome20_TimeTime()
     {
-        // Captured from Chrome 20.x - "time:" then "time:" once more (sent from browser)
-        String time1 = "c18782467424a88fb869374474";
-        String time2 = "c1853cfda17f16fcb07f3c";
-        byte rawbuf[] = Hex.asByteArray(time1 + time2);
-        assertIncoming(rawbuf,"time:","time:");
+        Tester tester = serverExtensions.newTester("deflate-frame");
+
+        tester.assertNegotiated("deflate-frame");
+
+        tester.parseIncomingHex(// Captured from Chrome 20.x - "time:" then "time:" once more (sent from browser)
+                "c18782467424a88fb869374474", // "time:"
+                "c1853cfda17f16fcb07f3c" // "time:"
+                );
+
+        tester.assertHasFrames("time:","time:");
     }
 
     @Test
     public void testPyWebSocket_TimeTimeTime()
     {
-        // Captured from Pywebsocket (r781) - "time:" sent 3 times.
-        String time1 = "c1876b100104" + "41d9cd49de1201";
-        String time2 = "c1852ae3ff01" + "00e2ee012a";
-        String time3 = "c18435558caa" + "37468caa";
-        byte rawbuf[] = Hex.asByteArray(time1 + time2 + time3);
-        assertIncoming(rawbuf,"time:","time:","time:");
+        Tester tester = serverExtensions.newTester("deflate-frame");
+
+        tester.assertNegotiated("deflate-frame");
+
+        tester.parseIncomingHex(// Captured from Pywebsocket (r781) - "time:" sent 3 times.
+                "c1876b100104" + "41d9cd49de1201", // "time:"
+                "c1852ae3ff01" + "00e2ee012a", // "time:"
+                "c18435558caa" + "37468caa" // "time:"
+                );
+
+        tester.assertHasFrames("time:","time:","time:");
     }
 
     @Test
@@ -202,11 +229,6 @@ public class DeflateFrameExtensionTest
 
         List<String> actual = capture.getCaptured();
         
-        for (String entry : actual)
-        {
-            System.err.printf("actual: \"%s\"%n",entry);
-        }
-
         Assert.assertThat("Compressed Payloads",actual,contains(expected));
     }
 

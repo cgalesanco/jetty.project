@@ -1,6 +1,6 @@
 //
 //  ========================================================================
-//  Copyright (c) 1995-2013 Mort Bay Consulting Pty. Ltd.
+//  Copyright (c) 1995-2014 Mort Bay Consulting Pty. Ltd.
 //  ------------------------------------------------------------------------
 //  All rights reserved. This program and the accompanying materials
 //  are made available under the terms of the Eclipse Public License v1.0
@@ -240,7 +240,7 @@ public class AsyncServletIOTest
         int w=0;
         for (String line : list)
         {
-            System.err.println(line);
+            // System.err.println(line);
             if ("-".equals(line))
                 continue;
             assertEquals(writes[w],line.length());

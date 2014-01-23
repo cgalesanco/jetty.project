@@ -1,6 +1,6 @@
 //
 //  ========================================================================
-//  Copyright (c) 1995-2013 Mort Bay Consulting Pty. Ltd.
+//  Copyright (c) 1995-2014 Mort Bay Consulting Pty. Ltd.
 //  ------------------------------------------------------------------------
 //  All rights reserved. This program and the accompanying materials
 //  are made available under the terms of the Eclipse Public License v1.0
@@ -29,6 +29,13 @@ import org.eclipse.jetty.websocket.common.events.JettyListenerEventDriver;
  */
 public class WebSocketSessionFactory implements SessionFactory
 {
+    private final SessionListener[] listeners;
+
+    public WebSocketSessionFactory(SessionListener... sessionListeners)
+    {
+        listeners = sessionListeners;
+    }
+
     @Override
     public boolean supports(EventDriver websocket)
     {
@@ -38,6 +45,6 @@ public class WebSocketSessionFactory implements SessionFactory
     @Override
     public WebSocketSession createSession(URI requestURI, EventDriver websocket, LogicalConnection connection)
     {
-        return new WebSocketSession(requestURI,websocket,connection);
+        return new WebSocketSession(requestURI,websocket,connection,listeners);
     }
 }

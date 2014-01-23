@@ -1,6 +1,6 @@
 //
 //  ========================================================================
-//  Copyright (c) 1995-2013 Mort Bay Consulting Pty. Ltd.
+//  Copyright (c) 1995-2014 Mort Bay Consulting Pty. Ltd.
 //  ------------------------------------------------------------------------
 //  All rights reserved. This program and the accompanying materials
 //  are made available under the terms of the Eclipse Public License v1.0
@@ -26,7 +26,6 @@ import java.util.Map;
 
 import javax.websocket.CloseReason;
 import javax.websocket.DecodeException;
-import javax.websocket.MessageHandler.Whole;
 
 import org.eclipse.jetty.util.BufferUtil;
 import org.eclipse.jetty.util.log.Log;
@@ -230,6 +229,19 @@ public class JsrAnnotatedEventDriver extends AbstractJsrEventDriver implements E
         }
     }
 
+    @Override
+    public void onPing(ByteBuffer buffer)
+    {
+        try
+        {
+            events.callPong(jsrsession.getAsyncRemote(),websocket,buffer);
+        }
+        catch (DecodeException | IOException e)
+        {
+            onFatalError(e);
+        }
+    }
+    
     @Override
     public void onPong(ByteBuffer buffer)
     {

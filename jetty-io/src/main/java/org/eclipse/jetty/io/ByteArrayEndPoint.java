@@ -1,6 +1,6 @@
 //
 //  ========================================================================
-//  Copyright (c) 1995-2013 Mort Bay Consulting Pty. Ltd.
+//  Copyright (c) 1995-2014 Mort Bay Consulting Pty. Ltd.
 //  ------------------------------------------------------------------------
 //  All rights reserved. This program and the accompanying materials
 //  are made available under the terms of the Eclipse Public License v1.0
@@ -40,12 +40,12 @@ public class ByteArrayEndPoint extends AbstractEndPoint
     static final Logger LOG = Log.getLogger(ByteArrayEndPoint.class);
     public final static InetSocketAddress NOIP=new InetSocketAddress(0);
 
-    protected ByteBuffer _in;
-    protected ByteBuffer _out;
-    protected boolean _ishut;
-    protected boolean _oshut;
-    protected boolean _closed;
-    protected boolean _growOutput;
+    protected volatile ByteBuffer _in;
+    protected volatile ByteBuffer _out;
+    protected volatile boolean _ishut;
+    protected volatile boolean _oshut;
+    protected volatile boolean _closed;
+    protected volatile boolean _growOutput;
 
 
     /* ------------------------------------------------------------ */
@@ -285,6 +285,7 @@ public class ByteArrayEndPoint extends AbstractEndPoint
     @Override
     public void close()
     {
+        super.close();
         _closed=true;
     }
 

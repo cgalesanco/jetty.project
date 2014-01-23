@@ -1,6 +1,6 @@
 //
 //  ========================================================================
-//  Copyright (c) 1995-2013 Mort Bay Consulting Pty. Ltd.
+//  Copyright (c) 1995-2014 Mort Bay Consulting Pty. Ltd.
 //  ------------------------------------------------------------------------
 //  All rights reserved. This program and the accompanying materials
 //  are made available under the terms of the Eclipse Public License v1.0
@@ -58,6 +58,7 @@ public class WebSocketSession extends ContainerLifeCycle implements Session, Inc
     private final EventDriver websocket;
     private final LogicalConnection connection;
     private final Executor executor;
+    private final SessionListener[] sessionListeners;
     private ExtensionFactory extensionFactory;
     private String protocolVersion;
     private Map<String, String[]> parameterMap = new HashMap<>();
@@ -68,7 +69,7 @@ public class WebSocketSession extends ContainerLifeCycle implements Session, Inc
     private UpgradeRequest upgradeRequest;
     private UpgradeResponse upgradeResponse;
 
-    public WebSocketSession(URI requestURI, EventDriver websocket, LogicalConnection connection)
+    public WebSocketSession(URI requestURI, EventDriver websocket, LogicalConnection connection, SessionListener[] sessionListeners)
     {
         if (requestURI == null)
         {
@@ -78,6 +79,7 @@ public class WebSocketSession extends ContainerLifeCycle implements Session, Inc
         this.requestURI = requestURI;
         this.websocket = websocket;
         this.connection = connection;
+        this.sessionListeners = sessionListeners;
         this.executor = connection.getExecutor();
         this.outgoingHandler = connection;
         this.incomingHandler = websocket;
@@ -333,22 +335,53 @@ public class WebSocketSession extends ContainerLifeCycle implements Session, Inc
     {
         incomingError(cause);
     }
-
+    
+    @SuppressWarnings("incomplete-switch")
     @Override
     public void onConnectionStateChange(ConnectionState state)
     {
-        if (state == ConnectionState.CLOSED)
+        switch (state)
         {
-            IOState ioState = this.connection.getIOState();
-            // The session only cares about abnormal close, as we need to notify
-            // the endpoint of this close scenario.
-            if (ioState.wasAbnormalClose())
-            {
-                CloseInfo close = ioState.getCloseInfo();
-                LOG.debug("Detected abnormal close: {}",close);
-                // notify local endpoint
-                notifyClose(close.getStatusCode(),close.getReason());
-            }
+            case CLOSING:
+                // notify session listeners
+                for (SessionListener listener : sessionListeners)
+                {
+                    try
+                    {
+                        listener.onSessionClosed(this);
+                    }
+                    catch (Throwable t)
+                    {
+                        LOG.ignore(t);
+                    }
+                }
+                break;
+            case CLOSED:
+                IOState ioState = this.connection.getIOState();
+                // The session only cares about abnormal close, as we need to notify
+                // the endpoint of this close scenario.
+                if (ioState.wasAbnormalClose())
+                {
+                    CloseInfo close = ioState.getCloseInfo();
+                    LOG.debug("Detected abnormal close: {}",close);
+                    // notify local endpoint
+                    notifyClose(close.getStatusCode(),close.getReason());
+                }
+                break;
+            case OPEN:
+                // notify session listeners
+                for (SessionListener listener : sessionListeners)
+                {
+                    try
+                    {
+                        listener.onSessionOpened(this);
+                    }
+                    catch (Throwable t)
+                    {
+                        LOG.ignore(t);
+                    }
+                }
+                break;
         }
     }
 

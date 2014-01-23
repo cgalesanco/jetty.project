@@ -1,6 +1,6 @@
 //
 //  ========================================================================
-//  Copyright (c) 1995-2013 Mort Bay Consulting Pty. Ltd.
+//  Copyright (c) 1995-2014 Mort Bay Consulting Pty. Ltd.
 //  ------------------------------------------------------------------------
 //  All rights reserved. This program and the accompanying materials
 //  are made available under the terms of the Eclipse Public License v1.0
@@ -988,6 +988,22 @@ public class Request implements HttpServletRequest
     }
 
     /* ------------------------------------------------------------ */
+    /**
+     * Access the underlying Remote {@link InetSocketAddress} for this request.
+     * 
+     * @return the remote {@link InetSocketAddress} for this request, or null if the request has no remote (see {@link ServletRequest#getRemoteAddr()} for
+     *         conditions that result in no remote address)
+     */
+    public InetSocketAddress getRemoteInetSocketAddress()
+    {
+        InetSocketAddress remote = _remote;
+        if (remote == null)
+            remote = _channel.getRemoteAddress();
+
+        return remote;
+    }
+
+    /* ------------------------------------------------------------ */
     /*
      * @see javax.servlet.ServletRequest#getRemoteAddr()
      */
@@ -1907,7 +1923,7 @@ public class Request implements HttpServletRequest
     {
         _remote = addr;
     }
-
+    
     /* ------------------------------------------------------------ */
     /**
      * @param requestedSessionId
@@ -2169,7 +2185,7 @@ public class Request implements HttpServletRequest
     {
         // extract parameters from dispatch query
         MultiMap<String> parameters = new MultiMap<>();
-        UrlEncoded.decodeTo(query,parameters, StandardCharsets.UTF_8,-1); //have to assume UTF-8 because we can't know otherwise
+        UrlEncoded.decodeTo(query,parameters, UrlEncoded.ENCODING,-1); //have to assume ENCODING because we can't know otherwise
 
         boolean merge_old_query = false;
 
@@ -2194,7 +2210,7 @@ public class Request implements HttpServletRequest
                 
                 
                 MultiMap<String> overridden_new_query = new MultiMap<>();
-                UrlEncoded.decodeTo(query,overridden_new_query,StandardCharsets.UTF_8,-1); //have to assume utf8 as we cannot know otherwise
+                UrlEncoded.decodeTo(query,overridden_new_query,UrlEncoded.ENCODING,-1); //have to assume ENCODING as we cannot know otherwise
 
                 for(String name: overridden_old_query.keySet())
                 {

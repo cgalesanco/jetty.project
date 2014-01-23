@@ -1,6 +1,6 @@
 //
 //  ========================================================================
-//  Copyright (c) 1995-2013 Mort Bay Consulting Pty. Ltd.
+//  Copyright (c) 1995-2014 Mort Bay Consulting Pty. Ltd.
 //  ------------------------------------------------------------------------
 //  All rights reserved. This program and the accompanying materials
 //  are made available under the terms of the Eclipse Public License v1.0
@@ -115,7 +115,8 @@ public class WebAppContext extends ServletContextHandler implements WebAppClassL
         "org.eclipse.jetty.jndi.",          // webapp cannot change naming classes
         "org.eclipse.jetty.jaas.",          // webapp cannot change jaas classes
         "org.eclipse.jetty.websocket.",     // webapp cannot change / replace websocket classes
-        "org.eclipse.jetty.servlet.DefaultServlet" // webapp cannot change default servlets
+        "org.eclipse.jetty.servlet.DefaultServlet", // webapp cannot change default servlets
+        "org.eclipse.jetty.servlets.AsyncGzipFilter" // special case for AsyncGzipFilter
     } ;
 
     // Server classes are classes that are hidden from being

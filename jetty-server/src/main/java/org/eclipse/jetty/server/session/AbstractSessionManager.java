@@ -1,6 +1,6 @@
 //
 //  ========================================================================
-//  Copyright (c) 1995-2013 Mort Bay Consulting Pty. Ltd.
+//  Copyright (c) 1995-2014 Mort Bay Consulting Pty. Ltd.
 //  ------------------------------------------------------------------------
 //  All rights reserved. This program and the accompanying materials
 //  are made available under the terms of the Eclipse Public License v1.0
@@ -227,11 +227,25 @@ public abstract class AbstractSessionManager extends AbstractLifeCycle implement
                 _sessionIdManager=server.getSessionIdManager();
                 if (_sessionIdManager==null)
                 {
-                    _sessionIdManager=new HashSessionIdManager();
-                    server.setSessionIdManager(_sessionIdManager);
+                    //create a default SessionIdManager and set it as the shared
+                    //SessionIdManager for the Server, being careful NOT to use
+                    //the webapp context's classloader, otherwise if the context
+                    //is stopped, the classloader is leaked.
+                    ClassLoader serverLoader = server.getClass().getClassLoader();
+                    try
+                    {
+                        Thread.currentThread().setContextClassLoader(serverLoader);
+                        _sessionIdManager=new HashSessionIdManager();
+                        server.setSessionIdManager(_sessionIdManager);
+                    }
+                    finally
+                    {
+                        Thread.currentThread().setContextClassLoader(_loader);
+                    }
                 }
             }
         }
+        
         if (!_sessionIdManager.isStarted())
             _sessionIdManager.start();
 

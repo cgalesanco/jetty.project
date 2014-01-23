@@ -1,6 +1,6 @@
 //
 //  ========================================================================
-//  Copyright (c) 1995-2013 Mort Bay Consulting Pty. Ltd.
+//  Copyright (c) 1995-2014 Mort Bay Consulting Pty. Ltd.
 //  ------------------------------------------------------------------------
 //  All rights reserved. This program and the accompanying materials
 //  are made available under the terms of the Eclipse Public License v1.0
@@ -2180,7 +2180,6 @@ public class ContextHandler extends ScopedHandler implements Attributes, Gracefu
             try
             {
                 Class<? extends EventListener> clazz = _classLoader==null?Loader.loadClass(ContextHandler.class,className):_classLoader.loadClass(className);
-                checkListener(clazz);
                 addListener(clazz);
             }
             catch (ClassNotFoundException e)
@@ -2207,13 +2206,10 @@ public class ContextHandler extends ScopedHandler implements Attributes, Gracefu
             if (!_enabled)
                 throw new UnsupportedOperationException();
 
-            checkListener(listenerClass);
-
             try
             {
                 EventListener e = createListener(listenerClass);
-                ContextHandler.this.addEventListener(e);
-                ContextHandler.this.addProgrammaticListener(e);
+                addListener(e);
             }
             catch (ServletException e)
             {

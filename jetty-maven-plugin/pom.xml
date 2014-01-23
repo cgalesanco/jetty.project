@@ -2,11 +2,11 @@
   <parent>
     <groupId>org.eclipse.jetty</groupId>
     <artifactId>jetty-project</artifactId>
-    <version>9.1.0.v20131115</version>
+    <version>9.1.1.v20140108</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>jetty-maven-plugin</artifactId>
-  <version>9.1.0.JSE</version>
+  <version>9.1.1.JSE</version>
   <packaging>maven-plugin</packaging>
   <name>Jetty :: Jetty Maven Plugin</name>
   <properties>

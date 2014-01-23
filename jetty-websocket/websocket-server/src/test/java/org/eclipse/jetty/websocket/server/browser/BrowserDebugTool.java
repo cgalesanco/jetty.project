@@ -1,6 +1,6 @@
 //
 //  ========================================================================
-//  Copyright (c) 1995-2013 Mort Bay Consulting Pty. Ltd.
+//  Copyright (c) 1995-2014 Mort Bay Consulting Pty. Ltd.
 //  ------------------------------------------------------------------------
 //  All rights reserved. This program and the accompanying materials
 //  are made available under the terms of the Eclipse Public License v1.0
@@ -100,7 +100,6 @@ public class BrowserDebugTool implements WebSocketCreator
         server = new Server();
         ServerConnector connector = new ServerConnector(server);
         connector.setPort(port);
-
         server.addConnector(connector);
 
         WebSocketHandler wsHandler = new WebSocketHandler()
@@ -114,7 +113,7 @@ public class BrowserDebugTool implements WebSocketCreator
                 factory.setCreator(BrowserDebugTool.this);
 
                 // Set the timeout
-                factory.getPolicy().setIdleTimeout(20000);
+                factory.getPolicy().setIdleTimeout(30000);
             }
         };
 

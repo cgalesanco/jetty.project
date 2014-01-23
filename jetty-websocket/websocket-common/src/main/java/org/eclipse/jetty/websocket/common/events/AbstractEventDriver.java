@@ -1,6 +1,6 @@
 //
 //  ========================================================================
-//  Copyright (c) 1995-2013 Mort Bay Consulting Pty. Ltd.
+//  Copyright (c) 1995-2014 Mort Bay Consulting Pty. Ltd.
 //  ------------------------------------------------------------------------
 //  All rights reserved. This program and the accompanying materials
 //  are made available under the terms of the Eclipse Public License v1.0
@@ -42,6 +42,7 @@ import org.eclipse.jetty.websocket.common.message.MessageAppender;
 public abstract class AbstractEventDriver implements IncomingFrames, EventDriver
 {
     private static final Logger LOG = Log.getLogger(AbstractEventDriver.class);
+    protected final Logger TARGET_LOG;
     protected final WebSocketPolicy policy;
     protected final Object websocket;
     protected WebSocketSession session;
@@ -51,11 +52,12 @@ public abstract class AbstractEventDriver implements IncomingFrames, EventDriver
     {
         this.policy = policy;
         this.websocket = websocket;
+        this.TARGET_LOG = Log.getLogger(websocket.getClass());
     }
 
     protected void appendMessage(ByteBuffer buffer, boolean fin) throws IOException
     {
-        activeMessage.appendMessage(buffer,fin);
+        activeMessage.appendFrame(buffer,fin);
 
         if (fin)
         {
@@ -129,11 +131,15 @@ public abstract class AbstractEventDriver implements IncomingFrames, EventDriver
                 }
                 case OpCode.PING:
                 {
+                    if (LOG.isDebugEnabled())
+                    {
+                        LOG.debug("PING: {}",BufferUtil.toDetailString(frame.getPayload()));
+                    }
                     ByteBuffer pongBuf;
                     if (frame.hasPayload())
                     {
                         pongBuf = ByteBuffer.allocate(frame.getPayload().remaining());
-                        BufferUtil.put(frame.getPayload(),pongBuf);
+                        BufferUtil.put(frame.getPayload().slice(),pongBuf);
                         BufferUtil.flipToFlush(pongBuf,0);
                     }
                     else
@@ -146,6 +152,10 @@ public abstract class AbstractEventDriver implements IncomingFrames, EventDriver
                 }
                 case OpCode.PONG:
                 {
+                    if (LOG.isDebugEnabled())
+                    {
+                        LOG.debug("PONG: {}",BufferUtil.toDetailString(frame.getPayload()));
+                    }
                     onPong(frame.getPayload());
                     break;
                 }
@@ -230,7 +240,7 @@ public abstract class AbstractEventDriver implements IncomingFrames, EventDriver
 
     private void unhandled(Throwable t)
     {
-        LOG.warn("Unhandled Error (closing connection)",t);
+        TARGET_LOG.warn("Unhandled Error (closing connection)",t);
         onError(t);
 
         // Unhandled Error, close the connection.

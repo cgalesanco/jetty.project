@@ -1,6 +1,6 @@
 //
 //  ========================================================================
-//  Copyright (c) 1995-2013 Mort Bay Consulting Pty. Ltd.
+//  Copyright (c) 1995-2014 Mort Bay Consulting Pty. Ltd.
 //  ------------------------------------------------------------------------
 //  All rights reserved. This program and the accompanying materials
 //  are made available under the terms of the Eclipse Public License v1.0
@@ -28,7 +28,6 @@ import org.eclipse.jetty.util.BufferUtil;
 import org.eclipse.jetty.util.StringUtil;
 import org.eclipse.jetty.util.Trie;
 import org.eclipse.jetty.util.TypeUtil;
-import org.eclipse.jetty.util.URIUtil;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.Logger;
 
@@ -1147,7 +1146,7 @@ public class HttpParser
                     throw new BadMessage("Illegal character");
 
                 case HEADER_IN_VALUE:
-                    if (ch>=HttpTokens.SPACE || ch<0)
+                    if (ch>=HttpTokens.SPACE || ch<0 || ch==HttpTokens.TAB)
                     {
                         if (_valueString!=null)
                         {

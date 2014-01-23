@@ -1,6 +1,6 @@
 //
 //  ========================================================================
-//  Copyright (c) 1995-2013 Mort Bay Consulting Pty. Ltd.
+//  Copyright (c) 1995-2014 Mort Bay Consulting Pty. Ltd.
 //  ------------------------------------------------------------------------
 //  All rights reserved. This program and the accompanying materials
 //  are made available under the terms of the Eclipse Public License v1.0
@@ -18,7 +18,7 @@
 
 package org.eclipse.jetty.websocket.common.extensions;
 
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -166,6 +166,22 @@ public class ExtensionStackTest
     {
         ExtensionStack stack = createExtensionStack();
         // Shouldn't cause a NPE.
+        LOG.debug("Shouldn't cause a NPE: {}",stack.toString());
+    }
+    
+    @Test
+    public void testNegotiateChrome32()
+    {
+        ExtensionStack stack = createExtensionStack();
+        
+        String chromeRequest = "permessage-deflate; client_max_window_bits, x-webkit-deflate-frame";
+        List<ExtensionConfig> requestedConfigs = ExtensionConfig.parseList(chromeRequest);
+        stack.negotiate(requestedConfigs);
+        
+        List<ExtensionConfig> negotiated = stack.getNegotiatedExtensions();
+        String response = ExtensionConfig.toHeaderValue(negotiated);
+        
+        Assert.assertThat("Negotiated Extensions", response, is("permessage-deflate"));
         LOG.debug("Shouldn't cause a NPE: {}",stack.toString());
     }
 }

@@ -1,6 +1,6 @@
 //
 //  ========================================================================
-//  Copyright (c) 1995-2013 Mort Bay Consulting Pty. Ltd.
+//  Copyright (c) 1995-2014 Mort Bay Consulting Pty. Ltd.
 //  ------------------------------------------------------------------------
 //  All rights reserved. This program and the accompanying materials
 //  are made available under the terms of the Eclipse Public License v1.0
@@ -21,9 +21,7 @@ package org.eclipse.jetty.websocket.common.message;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
-
-import org.eclipse.jetty.util.StringUtil;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Support class for reading a (single) WebSocket TEXT message via a Reader.
@@ -36,14 +34,14 @@ public class MessageReader extends InputStreamReader implements MessageAppender
 
     public MessageReader(MessageInputStream stream)
     {
-        super(stream,StringUtil.__UTF8_CHARSET);
+        super(stream,StandardCharsets.UTF_8);
         this.stream = stream;
     }
 
     @Override
-    public void appendMessage(ByteBuffer payload, boolean isLast) throws IOException
+    public void appendFrame(ByteBuffer payload, boolean isLast) throws IOException
     {
-        this.stream.appendMessage(payload,isLast);
+        this.stream.appendFrame(payload,isLast);
     }
 
     @Override

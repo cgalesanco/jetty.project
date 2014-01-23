@@ -1,6 +1,6 @@
 //
 //  ========================================================================
-//  Copyright (c) 1995-2013 Mort Bay Consulting Pty. Ltd.
+//  Copyright (c) 1995-2014 Mort Bay Consulting Pty. Ltd.
 //  ------------------------------------------------------------------------
 //  All rights reserved. This program and the accompanying materials
 //  are made available under the terms of the Eclipse Public License v1.0
@@ -36,7 +36,9 @@ public class PathMappingsBenchmarkTest
     {
         private int iterations;
         private CyclicBarrier barrier;
+        @SuppressWarnings("unused")
         private long success;
+        @SuppressWarnings("unused")
         private long error;
 
         public AbstractPathMapThread(int iterations, CyclicBarrier barrier)

@@ -1,6 +1,6 @@
 //
 //  ========================================================================
-//  Copyright (c) 1995-2013 Mort Bay Consulting Pty. Ltd.
+//  Copyright (c) 1995-2014 Mort Bay Consulting Pty. Ltd.
 //  ------------------------------------------------------------------------
 //  All rights reserved. This program and the accompanying materials
 //  are made available under the terms of the Eclipse Public License v1.0
@@ -80,6 +80,7 @@ public class Util
                 javax.servlet.ServletRequestAttributeListener.class.isAssignableFrom(c) ||
                 javax.servlet.http.HttpSessionListener.class.isAssignableFrom(c) ||
                 javax.servlet.http.HttpSessionAttributeListener.class.isAssignableFrom(c) ||
+                javax.servlet.http.HttpSessionIdListener.class.isAssignableFrom(c) ||
                 javax.servlet.AsyncListener.class.isAssignableFrom(c) ||
                 javax.servlet.http.HttpUpgradeHandler.class.isAssignableFrom(c))
             return true;
@@ -98,6 +99,7 @@ public class Util
                 javax.servlet.ServletRequestAttributeListener.class.isAssignableFrom(c) ||
                 javax.servlet.http.HttpSessionListener.class.isAssignableFrom(c) ||
                 javax.servlet.http.HttpSessionAttributeListener.class.isAssignableFrom(c) ||
+                javax.servlet.http.HttpSessionIdListener.class.isAssignableFrom(c) ||
                 javax.servlet.AsyncListener.class.isAssignableFrom(c) ||
                 javax.servlet.http.HttpUpgradeHandler.class.isAssignableFrom(c))
             return true;

@@ -1,6 +1,6 @@
 //
 //  ========================================================================
-//  Copyright (c) 1995-2013 Mort Bay Consulting Pty. Ltd.
+//  Copyright (c) 1995-2014 Mort Bay Consulting Pty. Ltd.
 //  ------------------------------------------------------------------------
 //  All rights reserved. This program and the accompanying materials
 //  are made available under the terms of the Eclipse Public License v1.0
@@ -20,9 +20,10 @@ package org.eclipse.jetty.websocket.common.io;
 
 import java.net.URI;
 
-import org.eclipse.jetty.websocket.common.OutgoingFramesCapture;
+import org.eclipse.jetty.websocket.common.SessionListener;
 import org.eclipse.jetty.websocket.common.WebSocketSession;
 import org.eclipse.jetty.websocket.common.events.EventDriver;
+import org.eclipse.jetty.websocket.common.test.OutgoingFramesCapture;
 import org.junit.rules.TestName;
 
 public class LocalWebSocketSession extends WebSocketSession
@@ -32,7 +33,7 @@ public class LocalWebSocketSession extends WebSocketSession
 
     public LocalWebSocketSession(TestName testname, EventDriver driver)
     {
-        super(URI.create("ws://localhost/LocalWebSocketSesssion/" + testname.getMethodName()),driver,new LocalWebSocketConnection(testname));
+        super(URI.create("ws://localhost/LocalWebSocketSesssion/" + testname.getMethodName()),driver,new LocalWebSocketConnection(testname), new SessionListener[0]);
         this.id = testname.getMethodName();
         outgoingCapture = new OutgoingFramesCapture();
         setOutgoingHandler(outgoingCapture);

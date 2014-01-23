@@ -1,6 +1,6 @@
 //
 //  ========================================================================
-//  Copyright (c) 1995-2013 Mort Bay Consulting Pty. Ltd.
+//  Copyright (c) 1995-2014 Mort Bay Consulting Pty. Ltd.
 //  ------------------------------------------------------------------------
 //  All rights reserved. This program and the accompanying materials
 //  are made available under the terms of the Eclipse Public License v1.0
@@ -18,24 +18,23 @@
 
 package org.eclipse.jetty.websocket.common.ab;
 
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
-import org.eclipse.jetty.util.StringUtil;
 import org.eclipse.jetty.websocket.api.WebSocketBehavior;
 import org.eclipse.jetty.websocket.api.WebSocketPolicy;
 import org.eclipse.jetty.websocket.api.extensions.Frame;
-import org.eclipse.jetty.websocket.common.ByteBufferAssert;
-import org.eclipse.jetty.websocket.common.Generator;
-import org.eclipse.jetty.websocket.common.IncomingFramesCapture;
 import org.eclipse.jetty.websocket.common.OpCode;
 import org.eclipse.jetty.websocket.common.Parser;
-import org.eclipse.jetty.websocket.common.UnitGenerator;
-import org.eclipse.jetty.websocket.common.UnitParser;
 import org.eclipse.jetty.websocket.common.WebSocketFrame;
 import org.eclipse.jetty.websocket.common.frames.TextFrame;
+import org.eclipse.jetty.websocket.common.test.ByteBufferAssert;
+import org.eclipse.jetty.websocket.common.test.IncomingFramesCapture;
+import org.eclipse.jetty.websocket.common.test.UnitGenerator;
+import org.eclipse.jetty.websocket.common.test.UnitParser;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -52,7 +51,7 @@ public class TestABCase1_1
         int length = 125;
         byte buf[] = new byte[length];
         Arrays.fill(buf,(byte)'*');
-        String text = new String(buf,StringUtil.__UTF8_CHARSET);
+        String text = new String(buf,StandardCharsets.UTF_8);
 
         Frame textFrame = new TextFrame().setPayload(text);
 
@@ -313,7 +312,7 @@ public class TestABCase1_1
         capture.assertNoErrors();
         capture.assertHasFrame(OpCode.TEXT,1);
 
-        Frame pActual = capture.getFrames().get(0);
+        Frame pActual = capture.getFrames().poll();
         Assert.assertThat("TextFrame.payloadLength",pActual.getPayloadLength(),is(length));
         // Assert.assertEquals("TextFrame.payload",length,pActual.getPayloadData().length);
     }
@@ -347,7 +346,7 @@ public class TestABCase1_1
         capture.assertNoErrors();
         capture.assertHasFrame(OpCode.TEXT,1);
 
-        Frame pActual = capture.getFrames().get(0);
+        Frame pActual = capture.getFrames().poll();
         Assert.assertThat("TextFrame.payloadLength",pActual.getPayloadLength(),is(length));
         // Assert.assertEquals("TextFrame.payload",length,pActual.getPayloadData().length);
     }
@@ -381,7 +380,7 @@ public class TestABCase1_1
         capture.assertNoErrors();
         capture.assertHasFrame(OpCode.TEXT,1);
 
-        Frame pActual = capture.getFrames().get(0);
+        Frame pActual = capture.getFrames().poll();
         Assert.assertThat("TextFrame.payloadLength",pActual.getPayloadLength(),is(length));
         // Assert.assertEquals("TextFrame.payload",length,pActual.getPayloadData().length);
     }
@@ -415,7 +414,7 @@ public class TestABCase1_1
         capture.assertNoErrors();
         capture.assertHasFrame(OpCode.TEXT,1);
 
-        Frame pActual = capture.getFrames().get(0);
+        Frame pActual = capture.getFrames().poll();
         Assert.assertThat("TextFrame.payloadLength",pActual.getPayloadLength(),is(length));
         // .assertEquals("TextFrame.payload",length,pActual.getPayloadData().length);
     }
@@ -451,7 +450,7 @@ public class TestABCase1_1
         capture.assertNoErrors();
         capture.assertHasFrame(OpCode.TEXT,1);
 
-        Frame pActual = capture.getFrames().get(0);
+        Frame pActual = capture.getFrames().poll();
         Assert.assertThat("TextFrame.payloadLength",pActual.getPayloadLength(),is(length));
         // Assert.assertEquals("TextFrame.payload",length,pActual.getPayloadData().length);
     }
@@ -488,7 +487,7 @@ public class TestABCase1_1
         capture.assertNoErrors();
         capture.assertHasFrame(OpCode.TEXT,1);
 
-        Frame pActual = capture.getFrames().get(0);
+        Frame pActual = capture.getFrames().poll();
         Assert.assertThat("TextFrame.payloadLength",pActual.getPayloadLength(),is(length));
         // Assert.assertEquals("TextFrame.payload",length,pActual.getPayloadData().length);
     }
@@ -512,7 +511,7 @@ public class TestABCase1_1
         capture.assertNoErrors();
         capture.assertHasFrame(OpCode.TEXT,1);
 
-        Frame pActual = capture.getFrames().get(0);
+        Frame pActual = capture.getFrames().poll();
         Assert.assertThat("TextFrame.payloadLength",pActual.getPayloadLength(),is(0));
     }
 }
