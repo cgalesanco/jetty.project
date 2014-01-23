@@ -6,13 +6,13 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>jetty-maven-plugin</artifactId>
-  <version>9.0.3.JSE</version>
+  <version>9.1.0.JSE</version>
   <packaging>maven-plugin</packaging>
   <name>Jetty :: Jetty Maven Plugin</name>
   <properties>
     <mavenVersion>3.0.3</mavenVersion>
     <pluginToolsVersion>3.1</pluginToolsVersion>
-    <jettyBaseVersion>9.0.3.v20130506</jettyBaseVersion>
+    <jettyBaseVersion>${project.parent.version}</jettyBaseVersion>
   </properties>
   <distributionManagement>
     <repository>
@@ -122,7 +122,7 @@
     <dependency>
       <groupId>org.eclipse.jetty.websocket</groupId>
       <artifactId>javax-websocket-server-impl</artifactId>
-      <version>${project.version}</version>
+      <version>${jettyBaseVersion}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty.websocket</groupId>
