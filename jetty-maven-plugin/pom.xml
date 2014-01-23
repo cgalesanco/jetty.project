@@ -6,12 +6,21 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <artifactId>jetty-maven-plugin</artifactId>
+  <version>9.0.3.JSE</version>
   <packaging>maven-plugin</packaging>
   <name>Jetty :: Jetty Maven Plugin</name>
   <properties>
     <mavenVersion>3.0.3</mavenVersion>
     <pluginToolsVersion>3.1</pluginToolsVersion>
+    <jettyBaseVersion>9.0.3.v20130506</jettyBaseVersion>
   </properties>
+  <distributionManagement>
+    <repository>
+      <id>cgalesanco</id>
+      <url>http://demo.desarrolloagil.es/nexus/content/repositories/releases</url>
+    </repository>
+  </distributionManagement>
+
   <build>
     <plugins>
       <plugin>
@@ -67,12 +76,12 @@
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-util</artifactId>
-      <version>${project.version}</version>
+      <version>${jettyBaseVersion}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-webapp</artifactId>
-      <version>${project.version}</version>
+      <version>${jettyBaseVersion}</version>
       <exclusions>
         <exclusion>
           <groupId>javax.servlet</groupId>
@@ -83,32 +92,32 @@
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-jaas</artifactId>
-      <version>${project.version}</version>
+      <version>${jettyBaseVersion}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-plus</artifactId>
-      <version>${project.version}</version>
+      <version>${jettyBaseVersion}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-jndi</artifactId>
-      <version>${project.version}</version>
+      <version>${jettyBaseVersion}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-server</artifactId>
-      <version>${project.version}</version>
+      <version>${jettyBaseVersion}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-jmx</artifactId>
-      <version>${project.version}</version>
+      <version>${jettyBaseVersion}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-annotations</artifactId>
-      <version>${project.version}</version>
+      <version>${jettyBaseVersion}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty.websocket</groupId>
@@ -118,12 +127,12 @@
     <dependency>
       <groupId>org.eclipse.jetty.websocket</groupId>
       <artifactId>websocket-server</artifactId>
-      <version>${project.version}</version>
+      <version>${jettyBaseVersion}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-jsp</artifactId>
-      <version>${project.version}</version>
+      <version>${jettyBaseVersion}</version>
     </dependency>
       <dependency>
         <groupId>org.eclipse.jetty.orbit</groupId>

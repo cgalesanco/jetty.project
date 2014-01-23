@@ -32,6 +32,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.codehaus.plexus.util.FileUtils;
+import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.util.Scanner;
 import org.eclipse.jetty.util.resource.Resource;
 import org.eclipse.jetty.webapp.WebAppContext;
@@ -135,7 +136,13 @@ public class JettyRunMojo extends AbstractJettyMojo
      */
     protected ScanTargetPattern[] scanTargetPatterns;
 
-    
+    /**
+     * Controls serving filtered war webResources.
+     *
+     * @parameter expression="${jetty.includeFilteredWarResources}"
+     */
+    protected boolean includeFilteredWarResources;
+
     /**
      * Extra scan targets as a list
      */
@@ -400,9 +407,28 @@ public class JettyRunMojo extends AbstractJettyMojo
         }
         getLog().info( "web.xml file = "+webApp.getDescriptor());       
         getLog().info("Webapp directory = " + webAppSourceDirectory.getCanonicalPath());
+
+        configureWarWebResources();
     }
-    
-    
+
+    private void configureWarWebResources() throws IOException {
+        ContextHandlerCollection contexts;
+        contexts = (ContextHandlerCollection)this.server.getChildHandlerByClass(ContextHandlerCollection.class);
+        if (contexts != null)
+        {
+            org.apache.maven.model.Resource[] resources = this.warPluginInfo.getWarWebResources();
+            if (resources != null && resources.length > 0)
+            {
+                for(int i = 0; i < resources.length; ++i )
+                {
+                    org.apache.maven.model.Resource r = resources[i];
+                    if ( includeFilteredWarResources || !r.isFiltering() ) {
+                        contexts.addHandler(new WarWebResourceHandler(r));
+                    }
+                }
+            }
+        }
+    }
 
     
     /** 

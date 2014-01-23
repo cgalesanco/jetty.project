@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.Resource;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
@@ -43,9 +44,10 @@ public class WarPluginInfo
     private List<String> _dependentMavenWarIncludes;
     private List<String> _dependentMavenWarExcludes;
     private List<OverlayConfig> _overlayConfigs;
-    
-    
-    
+    private Resource[] _webResources;
+
+
+
     /**
      * @param project
      */
@@ -181,10 +183,56 @@ public class WarPluginInfo
 
         return _overlayConfigs;
     }
-    
-    
-    
-    
+
+    public Resource[] getWarWebResources() {
+      if ( _webResources == null )
+      {
+        getPlugin();
+
+        if (_plugin == null)
+          return null;
+
+        Xpp3Dom node = (Xpp3Dom)_plugin.getConfiguration();
+        if (node == null || (node = node.getChild("webResources")) == null )
+          return null;
+
+        final Xpp3Dom[] resourceNodes = node.getChildren("resource");
+        List resources = new ArrayList(resourceNodes.length);
+
+        for (int i = 0; i < resourceNodes.length; ++i )
+        {
+          Xpp3Dom resourceNode = resourceNodes[i];
+          Resource resource = new Resource();
+          Xpp3Dom helperNode;
+
+          helperNode = resourceNode.getChild("targetPath");
+          if (helperNode != null)
+            resource.setTargetPath(helperNode.getValue());
+
+          helperNode = resourceNode.getChild("directory");
+          if (helperNode != null)
+            resource.setDirectory(helperNode.getValue());
+
+          helperNode = resourceNode.getChild("includes");
+          if (helperNode != null)
+            resource.setIncludes(processPatterns("include", helperNode));
+
+          helperNode = resourceNode.getChild("filtering");
+          if ( helperNode != null )
+            resource.setFiltering(helperNode.getValue());
+
+          helperNode = resourceNode.getChild("excludes");
+          if (helperNode != null)
+            resource.setExcludes(processPatterns("exclude", helperNode));
+
+          resources.add(resource);
+        }
+        _webResources = (Resource[]) resources.toArray(new Resource[resources.size()]);
+      }
+      return _webResources;
+    }
+
+
     /**
      * @return the xml as a string
      */
@@ -200,4 +248,18 @@ public class WarPluginInfo
             return "";
         return node.toString();
     }
+
+    private List processPatterns(String nodeName, final Xpp3Dom includesNode)
+    {
+        Xpp3Dom[] patternNodes = includesNode.getChildren(nodeName);
+        List patterns = new ArrayList(patternNodes.length);
+        for (int i = 0; i < patternNodes.length; i++ )
+        {
+            Xpp3Dom pattern = patternNodes[i];
+            patterns.add(pattern.getValue());
+        }
+        return patterns;
+    }
+
+
 }
